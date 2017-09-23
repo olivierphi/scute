@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring
 
 from typing import Callable
 
@@ -7,41 +8,41 @@ from typing import Callable
 
 class Container:
 
-    def __init__(self, values = None):
+    def __init__(self, values=None):
         self._values = values or {}
         self._callable_results_cache = {}
         self._factories = []
         self._protected = []
 
-    def __setitem__(self, id: str, value):
-        self._values[id] = value
+    def __setitem__(self, injection_id: str, value):
+        self._values[injection_id] = value
 
-    def __getitem__(self, id: str):
-        if id in self._callable_results_cache:
-            return self._callable_results_cache[id]
-        if id not in self._values:
-            raise UnknownIdentifierError(id)
+    def __getitem__(self, injection_id: str):
+        if injection_id in self._callable_results_cache:
+            return self._callable_results_cache[injection_id]
+        if injection_id not in self._values:
+            raise UnknownIdentifierError(injection_id)
 
-        is_callable: bool = callable(self._values[id])
+        is_callable: bool = callable(self._values[injection_id])
         if is_callable:
-            if self._values[id] in self._protected:
-                result = self._values[id]
+            if self._values[injection_id] in self._protected:
+                result = self._values[injection_id]
             else:
-                result = self._values[id](self)
+                result = self._values[injection_id](self)
         else:
-            result = self._values[id]
+            result = self._values[injection_id]
 
-        if self._values[id] not in self._factories:
-            self._callable_results_cache[id] = result
+        if self._values[injection_id] not in self._factories:
+            self._callable_results_cache[injection_id] = result
 
         return result
 
-    def __contains__(self, id: str):
-        return id in self._values
+    def __contains__(self, injection_id: str):
+        return injection_id in self._values
 
-    def __delitem__(self, id: str):
-        if id in self._values:
-            del self._values[id]
+    def __delitem__(self, injection_id: str):
+        if injection_id in self._values:
+            del self._values[injection_id]
 
     def factory(self, factory: Callable):
         if not callable(factory):
@@ -59,33 +60,34 @@ class Container:
 
         return protected
 
-    def raw(self, id: str):
-        if id not in self._values:
-            raise UnknownIdentifierError(id)
+    def raw(self, injection_id: str):
+        if injection_id not in self._values:
+            raise UnknownIdentifierError(injection_id)
 
-        return self._values[id]
+        return self._values[injection_id]
 
-    def extend(self, id: str, factory: Callable):
-        if id not in self._values:
-            raise UnknownIdentifierError(id)
-        if not callable(self._values[id]):
+    def extend(self, injection_id: str, factory: Callable):
+        if injection_id not in self._values:
+            raise UnknownIdentifierError(injection_id)
+        if not callable(self._values[injection_id]):
             raise NotCallableExtendedServiceError()
         if not callable(factory):
             raise NotCallableFactoryError()
 
-        extended_factory = self._values[id]
+        extended_factory = self._values[injection_id]
 
         def service_extension(container: Container):
             return factory(extended_factory(container), container)
 
-        self._values[id] = service_extension
+        self._values[injection_id] = service_extension
 
         return service_extension
 
 
 class UnknownIdentifierError(Exception):
-    def __init__(self, id: str):
-        self.id = id
+    def __init__(self, injection_id: str, *args, **kwargs):
+        super(UnknownIdentifierError, self).__init__(*args, **kwargs)
+        self.injection_id = injection_id
 
 
 class NotCallableExtendedServiceError(Exception):

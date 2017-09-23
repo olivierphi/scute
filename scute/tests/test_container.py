@@ -1,4 +1,4 @@
-# pylint: disable=invalid-name
+# pylint: skip-file
 
 from scute import Container, \
     NotCallableExtendedServiceError, NotCallableFactoryError, NotCallableProtectError, UnknownIdentifierError
@@ -77,7 +77,7 @@ def test_error_if_non_existent_id():
 
     with pytest.raises(UnknownIdentifierError) as excinfo:
         a = container['foo']
-    assert excinfo.value.id == 'foo'
+    assert excinfo.value.injection_id == 'foo'
 
 
 def test_honors_none_values():
@@ -154,7 +154,7 @@ def test_raw_error_if_non_existent_id():
 
     with pytest.raises(UnknownIdentifierError) as excinfo:
         container.raw('foo')
-    assert excinfo.value.id == 'foo'
+    assert excinfo.value.injection_id == 'foo'
 
 
 def test_extend():
@@ -182,7 +182,7 @@ def test_extend_error_if_non_existent_id():
 
     with pytest.raises(UnknownIdentifierError) as excinfo:
         container.extend('foo', lambda: True)
-    assert excinfo.value.id == 'foo'
+    assert excinfo.value.injection_id == 'foo'
 
 
 def test_non_callable_extended_should_raise_an_error():
