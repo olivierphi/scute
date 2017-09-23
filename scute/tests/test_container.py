@@ -80,13 +80,6 @@ def test_error_if_non_existent_id():
     assert excinfo.value.injection_id == 'foo'
 
 
-def test_honors_none_values():
-    container = Container()
-    container['foo'] = None
-
-    assert container['foo'] is None
-
-
 def test_del():
     container = Container()
     container['param'] = 'value'
@@ -140,13 +133,6 @@ def test_raw():
 
     assert callable(container.raw('service'))
     assert container.raw('service') is my_function
-
-
-def test_raw_honors_none_values():
-    container = Container()
-    container['foo'] = None
-
-    assert container.raw('foo') is None
 
 
 def test_raw_error_if_non_existent_id():
@@ -223,6 +209,55 @@ def test_non_callable_class_should_be_treated_as_a_parameter():
     non_callable_two = container['non_callable']
     assert isinstance(non_callable_two, NonCallable)
     assert non_callable_one is non_callable_two
+
+
+def test_decorator():
+    container = Container()
+
+    container['param'] = 'value'
+    container['service'] = lambda container: Service()
+    container['None'] = None
+
+    test_value = 0
+
+    @container.bind_callable(('param', 'service', 'None'))
+    def decorated_service(param, service, none=True, not_injected=42):
+        nonlocal test_value
+        assert param == 'value'
+        assert isinstance(service, Service)
+        assert none is None
+        assert not_injected is 42
+        test_value = 1
+
+    assert test_value == 0
+    decorated_service()
+    assert test_value == 1
+
+
+def test_decorator_with_binded_service():
+    container = Container()
+
+    container['param'] = 'value'
+    container['service'] = lambda container: Service()
+    container['None'] = None
+
+    test_value = 0
+
+    @container.bind_callable(dependencies=('param', 'service', 'None'), injection_id='decorated')
+    def decorated_service(param, service, none=True, not_injected=42):
+        nonlocal test_value
+        assert param == 'value'
+        assert isinstance(service, Service)
+        assert none is None
+        assert not_injected is 42
+        test_value = 1
+        return Service(6)
+
+    assert test_value == 0
+    decorated_service = container['decorated']
+    assert isinstance(decorated_service, Service)
+    assert decorated_service.value == 6
+    assert test_value == 1
 
 
 class Service:

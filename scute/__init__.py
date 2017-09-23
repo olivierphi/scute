@@ -84,19 +84,40 @@ class Container:
         return service_extension
 
 
+    def bind_callable(self, dependencies: tuple, injection_id: str = None):
+        def decorator(injections_target: Callable):
+            if not callable(injections_target):
+                raise NotCallableError()
+
+            def callable_wrapped(container=None): # pylint: disable=unused-argument
+                resolved_dependencies = (self[injection_id] for injection_id in dependencies)
+                return injections_target(*resolved_dependencies)
+
+            if injection_id is not None:
+                self._values[injection_id] = callable_wrapped
+
+            return callable_wrapped
+
+        return decorator
+
+
 class UnknownIdentifierError(Exception):
     def __init__(self, injection_id: str, *args, **kwargs):
         super(UnknownIdentifierError, self).__init__(*args, **kwargs)
         self.injection_id = injection_id
 
 
-class NotCallableExtendedServiceError(Exception):
+class NotCallableError(Exception):
     pass
 
 
-class NotCallableFactoryError(Exception):
+class NotCallableExtendedServiceError(NotCallableError):
     pass
 
 
-class NotCallableProtectError(Exception):
+class NotCallableFactoryError(NotCallableError):
+    pass
+
+
+class NotCallableProtectError(NotCallableError):
     pass

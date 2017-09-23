@@ -1,0 +1,7 @@
+[MASTER]
+ignore=.git
+
+[MESSAGES CONTROL]
+max-line-length=120
+
+disable=missing-docstring

@@ -1,9 +1,11 @@
 # Scute
 
 Scute is a small Dependency Injection Container for Python 3.6+, ported from PHP's [Pimple](https://github.com/silexphp/Pimple/tree/1.1), that consists
-of just one file and one class (about 80 lines of code).
+of just one file and one class (about 100 lines of code).
 
-The test suite, and even this README file, are basically a copy-n-paste of Pimple's ones, with only a light adaptation to Python.
+The test suite, and even this README file, are basically a copy-n-paste of Pimple's ones, with only a light adaptation to Python
+and some Pythonic additions like decorators.
+
 So all kudos go to [Fabien Potencier](http://fabien.potencier.org/) and to Pimple contributors!
 
 
@@ -27,6 +29,8 @@ Creating a container is a matter of instating the `Container` class:
 
 As many other dependency injection containers, Scute is able to manage two
 different kind of data: *services* and *parameters*.
+
+(note that a quick look at [the test suite](scute/tests/test_container.py) can also give you a pretty good overview of this module features)
 
 Defining Parameters
 -------------------
@@ -93,7 +97,7 @@ Protecting Parameters
 
 Because Scute sees callables as service definitions, you need to
 wrap anonymous functions with the `protect()` method to store them as
-parameter::
+parameter:
 
 ```python
     container['random'] = container.protect(lambda: randrange(10000))
@@ -104,7 +108,7 @@ Modifying services after creation
 
 In some cases you may want to modify a service definition after it has been
 defined. You can use the `extend()` method to define additional code to
-be run on your service just after it is created::
+be run on your service just after it is created:
 
 ```python
     container['mail'] = lambda c: MailjetApi(user = c['email.user'], password = ['email.password'])
@@ -124,8 +128,35 @@ Fetching the service creation function
 
 When you access an object, Scute automatically calls the callable (function, lambda, callable class...)
 that you defined, which creates the service object for you. If you want to get
-raw access to this function, you can use the `raw()` method::
+raw access to this function, you can use the `raw()` method:
 
 ```python
-    session_function = $container.raw('session')
+    session_function = container.raw('session')
+```
+
+Managing injections with a decorator
+------------------------------------
+
+You can also manage a callable dependencies with a decorator:
+
+```python
+    @container.bind_callable(('mailer', 'signal'))
+    def send_email(mailer: Mailer, email_sent_signal: Signal):
+        mailer.send_email(config)
+        email_sent_signal.send()
+
+```
+
+But if you add the `injection_id` parameter, this callable will also be a service itself!
+
+
+```python
+    @container.bind_callable(('config', 'mailer', 'signal'), injection_id='app_mailer')
+    def app_mailer(config: tuple, mailer: Mailer, signal: Signal):
+        mailer.add_config(config)
+        mailer.set_signal(signal)
+
+        return mailer
+
+    # your container now has a new 'app_mailer' service, that can be injected into other services
 ```
