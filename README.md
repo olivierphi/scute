@@ -1,6 +1,7 @@
 # Scute
 
 [![Build Status](https://travis-ci.org/DrBenton/scute.svg?branch=master)](https://travis-ci.org/DrBenton/scute)
+[![PyPI Version](https://img.shields.io/pypi/v/scute.svg)](https://pypi.org/project/scute/)
 
 Scute is a small Dependency Injection Container for Python 3.6+, ported from PHP's [Pimple](https://github.com/silexphp/Pimple/tree/1.1), that consists
 of just one file and one class (about 100 lines of code).
