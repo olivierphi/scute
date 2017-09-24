@@ -4,7 +4,7 @@ Scute is a small Dependency Injection Container for Python 3.6+, ported from PHP
 of just one file and one class (about 100 lines of code).
 
 The test suite, and even this README file, are basically a copy-n-paste of Pimple's ones, with only a light adaptation to Python
-and some Pythonic additions like decorators.
+and some Pythonic additions like [injections management through decorators](#managing-injections-with-a-decorator).
 
 So all kudos go to [Fabien Potencier](http://fabien.potencier.org/) and to Pimple contributors!
 
@@ -32,8 +32,7 @@ different kind of data: *services* and *parameters*.
 
 (note that a quick look at [the test suite](scute/tests/test_container.py) can also give you a pretty good overview of this module features)
 
-Defining Parameters
--------------------
+### Defining Parameters
 
 Defining a parameter is as simple as using the Scute instance as an array:
 
@@ -43,8 +42,7 @@ Defining a parameter is as simple as using the Scute instance as an array:
     container['session_storage_class'] = 'SessionStorage'
 ```
 
-Defining Services
------------------
+### Defining Services
 
 A service is an object that does something as part of a larger system.
 Examples of services: Database connection, templating engine, mailer. Almost
@@ -80,8 +78,7 @@ Using the defined services is also very easy:
     # session = Session(storage)
 ```
 
-Defining Factory Services
-------------------------
+### Defining Factory Services
 
 By default, each time you get a service, Scute returns the same instance of it.
 If you want a different instance to be returned for all calls, wrap your callable with the `factory()` method:
@@ -92,8 +89,7 @@ If you want a different instance to be returned for all calls, wrap your callabl
 
 Now, each call to `container['session']` returns a new instance of the session.
 
-Protecting Parameters
----------------------
+### Protecting Parameters
 
 Because Scute sees callables as service definitions, you need to
 wrap anonymous functions with the `protect()` method to store them as
@@ -103,8 +99,7 @@ parameter:
     container['random'] = container.protect(lambda: randrange(10000))
 ```
 
-Modifying services after creation
----------------------------------
+### Modifying services after creation
 
 In some cases you may want to modify a service definition after it has been
 defined. You can use the `extend()` method to define additional code to
@@ -123,8 +118,7 @@ The first argument is the name of the object, the second is a callable that
 gets access to the object instance and the container. The return value is
 a service definition, so you need to re-assign it on the container.
 
-Fetching the service creation function
---------------------------------------
+### Fetching the service creation function
 
 When you access an object, Scute automatically calls the callable (function, lambda, callable class...)
 that you defined, which creates the service object for you. If you want to get
@@ -134,13 +128,13 @@ raw access to this function, you can use the `raw()` method:
     session_function = container.raw('session')
 ```
 
-Managing injections with a decorator
-------------------------------------
+### Managing injections with a decorator
 
-You can also manage a callable dependencies with a decorator:
+You can also manage a callable dependencies with a decorator, by using the `bind_callable()` method
+and setting the dependencies to inject via a tuple of dependencies ids:
 
 ```python
-    @container.bind_callable(('mailer', 'signal'))
+    @container.bind_callable(('mailer', 'signal')) # 'mailer' and 'signal' are injections defined somewhere else on this Container
     def send_email(mailer: Mailer, email_sent_signal: Signal):
         mailer.send_email(config)
         email_sent_signal.send()
@@ -158,5 +152,5 @@ But if you add the `injection_id` parameter, this callable will also be a servic
 
         return mailer
 
-    # your container now has a new 'app_mailer' service, that can be injected into other services
+    # your container now has a new 'app_mailer' service, that can be injected into other services :-)
 ```
