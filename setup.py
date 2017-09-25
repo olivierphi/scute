@@ -52,7 +52,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 setup(
     name='scute',
 
-    version='1.0.1',
+    version='1.0.2',
 
 
     description='A small Dependency Injection Container, ported from PHP\'s Pimple',
@@ -60,7 +60,7 @@ setup(
 
     url='https://github.com/DrBenton/scute',
 
-    author='Olivier philippon',
+    author='Olivier Philippon',
     author_email='olivier@rougemine.com',
 
     license='MIT',
@@ -75,7 +75,8 @@ setup(
 
     keywords='Dependency injection',
 
-    py_modules=['scute'],
+    packages=['scute'],
+    package_dir={'scute': 'scute'},
 
     install_requires=[],
     python_requires='>=3.6',
