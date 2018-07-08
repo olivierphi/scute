@@ -1,6 +1,7 @@
 language: python
 python:
   - "3.6"
+  - "3.7-dev" # looking forward to get 3.7 on Travis CI :-)
 
 install:
   - pip install -r test-requirements.txt
