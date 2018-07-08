@@ -11,7 +11,6 @@ and some Pythonic additions like [injections management through decorators](#man
 
 So all kudos go to [Fabien Potencier](http://fabien.potencier.org/) and to Pimple contributors!
 
-
 Install it from PyPi:
 
 ```bash
@@ -31,7 +30,7 @@ Creating a container is a matter of instating the `Container` class:
 ```
 
 As many other dependency injection containers, Scute is able to manage two
-different kind of data: *services* and *parameters*.
+different kind of data: _services_ and _parameters_.
 
 (note that a quick look at [the test suite](scute/tests/test_container.py) can also give you a pretty good overview of this module features)
 
@@ -55,8 +54,8 @@ Services are defined by callables (lambda, functions or callable classes) that r
 object:
 
 ```python
-    // #define some services
-    define session_storage(c: Container):
+    #define some services
+    def session_storage(c: Container):
         session_storage_class_ref = getattr(importlib.import_module('app'), c['session_storage_class'])
         return session_storage_class_ref(c['cookie_name'])
     container['session_storage'] = session_storage
@@ -141,11 +140,9 @@ and setting the dependencies to inject via a tuple of dependencies ids:
     def send_email(mailer: Mailer, email_sent_signal: Signal):
         mailer.send_email(config)
         email_sent_signal.send()
-
 ```
 
 But if you add the `injection_id` parameter, this callable will also be a service itself!
-
 
 ```python
     @container.bind_callable(('config', 'mailer', 'signal'), injection_id='app_mailer')

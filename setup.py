@@ -57,6 +57,7 @@ setup(
 
     description='A small Dependency Injection Container, ported from PHP\'s Pimple',
     long_description=long_description,
+    long_description_content_type="text/markdown",
 
     url='https://github.com/DrBenton/scute',
 
