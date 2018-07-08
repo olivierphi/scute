@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+
+  python:
+    build: ./.docker
+    volumes: 
+      - .:/scute
+      - ~/.pypirc:/python/.pypirc
+    working_dir: /scute
+    environment:
+      PYTHONUSERBASE: /scute/vendor
