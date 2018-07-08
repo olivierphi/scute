@@ -1,10 +1,18 @@
+# Dependencies shared with the Docker container.
+/vendor
+
 # Compiled python modules.
 *.pyc
 
 # Setuptools distribution folder.
-/dist/
+/dist
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
 /.eggs
 .cache
+__pycache__
+/build
+
+# Pytest cache
+.pytest_cache
